@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+<record model="ir.ui.view" id="report_speedhut_quotation_document">
+    <field name="name">report_speedhut_quotation_document</field>
+    <field name="type">qweb</field>
+    <field name="model" eval="False"/>
+    <field name="inherit_id" eval="False"/>
+    <field name="priority">16</field>
+    <field name="arch" type="xml">
+      <t t-name="sh_sale_mod.report_speedhut_quotation_document">
+          <t t-call="report.external_layout">
+              <t t-set="doc" t-value="doc.with_context({'lang':doc.partner_id.lang})"/>
+              <div class="page">
+                  <div class="oe_structure"/>
+                  <div class="row">
+                      <div class="col-xs-4">
+                          <strong>Customer address:</strong>
+                          <div t-field="doc.partner_id.name"/>
+                          <div t-field="doc.partner_id" t-options="{&quot;widget&quot;: &quot;contact&quot;, &quot;fields&quot;: [&quot;address&quot;], &quot;no_marker&quot;: True}"/>
+                      </div>
+                      <div class="col-xs-4">
+                          <strong>Invoicing address:</strong>
+                          <div t-field="doc.partner_invoice_id.name"/>
+                          <div t-field="doc.partner_invoice_id" t-options="{&quot;widget&quot;: &quot;contact&quot;, &quot;fields&quot;: [&quot;address&quot;, &quot;phone&quot;, &quot;fax&quot;], &quot;no_marker&quot;: True, &quot;phone_icons&quot;: True}"/>
+                          <p t-if="doc.partner_id.vat">VAT: <span t-field="doc.partner_id.vat"/></p>
+                          <p t-if="doc.partner_id.email"><span t-field="doc.partner_id.email"/></p>
+                      </div>
+                      <div class="col-xs-4" t-if="doc.partner_shipping_id != doc.partner_invoice_id" >
+                          <strong>Shipping address:</strong>
+                              <div t-field="doc.partner_shipping_id.name"/>
+                              <div t-field="doc.partner_shipping_id" t-options="{&quot;widget&quot;: &quot;contact&quot;, &quot;fields&quot;: [&quot;address&quot;, &quot;phone&quot;, &quot;fax&quot;], &quot;no_marker&quot;: True, &quot;phone_icons&quot;: True}"/>
+                              <p t-if="doc.partner_id.vat">VAT: <span t-field="doc.partner_id.vat"/></p>
+                              <p t-if="doc.partner_shipping_id.email"><span t-field="doc.partner_shipping_id.email"/></p>
+                      </div>
+                       <div class="col-xs-4" t-if="doc.partner_shipping_id == doc.partner_invoice_id">
+                          <strong>Shipping address:</strong>
+                          <div t-field="doc.partner_invoice_id.name"/>
+                          <div t-field="doc.partner_invoice_id" t-options="{&quot;widget&quot;: &quot;contact&quot;, &quot;fields&quot;: [&quot;address&quot;, &quot;phone&quot;, &quot;fax&quot;], &quot;no_marker&quot;: True, &quot;phone_icons&quot;: True}"/>
+                          <p t-if="doc.partner_id.vat">VAT: <span t-field="doc.partner_id.vat"/></p>
+                          <p t-if="doc.partner_id.email"><span t-field="doc.partner_id.email"/></p>
+                      </div>
+                  </div>
+
+                  <h2>
+                      <span>Speedhut Quotation</span>
+                  </h2>
+
+                  <t t-set="display_image" t-value="any([l.product_id.image_medium for l in doc.order_line])"/>
+
+                  <t t-foreach="doc.order_lines_layouted()" t-as="page">
+                      <table class="table table-condensed">
+                          <thead>
+                              <tr>
+                                  <th t-if="display_image"> </th>
+                                  <th>SKU</th>
+                                  <th>Description</th>
+                              </tr>
+                         </thead>
+                         <tbody class="sale_tbody">
+                              <t t-foreach="page" t-as="layout_category">
+
+                                  <t t-if="layout_category_size &gt; 1 or page_size &gt; 1" groups="sale.group_sale_layout">
+                                      <tr class="active">
+                                          <td colspan="7" style="font-weight: bold; border-bottom: 1px solid black;">&amp;bull;
+                                              <t t-esc="layout_category['name']"/>
+                                          </td>
+                                      </tr>
+                                  </t>
+                                  <!-- Lines associated -->
+                                  <t t-foreach="layout_category['lines']" t-as="l">
+                                      <tr>
+                                          <td width="30%" t-if="display_image"><img t-if="l.product_id.image_medium" t-att-src="'data:image/png;base64,'+l.product_id.image_medium" style="max-height: 80px;"/></td>
+                                          <td width="30%" style="white-space:nowrap;"><strong><span t-esc="str(l.product_id.code)"/></strong></td>
+                                          <td width="70%"><span t-field="l.name"/></td>
+                                      </tr>
+                                      <t t-set="pricelist_items" t-value="doc.pricelist_id.item_ids.filtered(lambda x: x.product_id.id == l.product_id.id)"/>
+                                      <tr t-if="pricelist_items">
+                                        <t t-foreach="pricelist_items.sorted(key=lambda r: r.min_quantity)" t-as="pli">
+                                            <tr>
+                                              <td><span t-field="pli.compute_price"/></td>
+                                              <td><span t-field="pli.min_quantity"/></td>
+                                              <td><span t-field="pli.fixed_price"/></td>
+                                            </tr>
+                                        </t>
+                                      </tr>
+                                      <t t-if="not pricelist_items">
+                                        <t t-set="global_pricelist_items" t-value="env['product.pricelist.item'].sudo().search([('product_id','=',l.product_id.id)])"/>
+                                        <tr t-if="global_pricelist_items">
+                                          <t t-foreach="global_pricelist_items.sorted(key=lambda r: r.min_quantity)" t-as="pli">
+                                              <tr>
+                                                <td><span t-field="pli.compute_price"/></td>
+                                                <td><span t-field="pli.min_quantity"/></td>
+                                                <td><span t-field="pli.fixed_price"/></td>
+                                              </tr>
+                                          </t>
+                                        </tr>
+                                      </t>
+                                  </t>
+                              </t>
+                          </tbody>
+                      </table>
+                  </t>
+                  <p t-field="doc.note"/>
+                  <div class="oe_structure"/>
+              </div>
+          </t>
+      </t>
+    </field>
+</record>
+<record model="ir.ui.view" id="report_speedhut_quotation">
+    <field name="name">report_speedhut_quotation</field>
+    <field name="type">qweb</field>
+    <field name="model" eval="False"/>
+    <field name="inherit_id" eval="False"/>
+    <field name="priority">16</field>
+    <field name="arch" type="xml">
+      <t t-name="sale_lfo.report_speedhut_quotation">
+          <t t-call="report.html_container">
+              <t t-foreach="docs" t-as="doc">
+                  <t t-call="sh_sale_mod.report_speedhut_quotation_document" t-lang="doc.partner_id.lang"/>
+              </t>
+          </t>
+      </t>
+    </field>
+  </record>
+  <record model="ir.actions.report.xml" id="report_report_speedhut_quotation">
+    <field name="name">Speedhut Quotation</field>
+    <field name="report_type">qweb-pdf</field>
+    <field name="model">sale.order</field>
+    <field name="report_name">sh_sale_mod.report_speedhut_quotation</field>
+  </record>
+  <record model="ir.values" id="value_print_report_report_speedhut_quotation">
+      <field name="name">Speedhut Quotation</field>
+      <field name="model">sale.order</field>
+      <field name="key2">client_print_multi</field>
+      <field name="value" eval="'ir.actions.report.xml,'+str(ref('report_report_speedhut_quotation'))"/>
+    </record>
+</odoo>
