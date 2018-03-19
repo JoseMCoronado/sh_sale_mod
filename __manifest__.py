@@ -20,7 +20,7 @@
 ###################################################################################
 
 {
-    'name': 'Sale Modifications for Speedhut,
+    'name': 'Sales Modifications for Speedhut',
     'category': 'Sale',
     'author': 'GFP Solutions LLC',
     'summary': 'Custom',
@@ -32,10 +32,9 @@ THIS MODULE IS PROVIDED AS IS - INSTALLATION AT USERS' OWN RISK - AUTHOR OF MODU
 RESPONSIBILITY FOR ANY BEHAVIOR ONCE INSTALLED.
         """,
 
-    'depends':['base','sale'],
+    'depends':['base','sale','crm','delivery','purchase','stock','stock_picking_wave','delivery','stock_landed_costs','stock_barcode','helpdesk','mrp_repair'],
     'data':[
             'views/ir_ui_qweb.xml',
             ],
     'installable': True,
-
 }
