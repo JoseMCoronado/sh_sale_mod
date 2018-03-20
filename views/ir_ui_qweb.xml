@@ -81,7 +81,7 @@
                                         </t>
                                       </tr>
                                       <t t-if="not pricelist_items">
-                                        <t t-set="global_pricelist_items" t-value="env['product.pricelist.item'].sudo().search([('product_id','=',l.product_id.id)])"/>
+                                        <t t-set="global_pricelist_items" t-value="env['product.pricelist.item'].sudo().search([('product_id.product_tmpl_id','=',l.product_id.product_tmpl_id.id)])"/>
                                         <tr t-if="global_pricelist_items">
                                           <t t-foreach="global_pricelist_items.sorted(key=lambda r: r.min_quantity)" t-as="pli">
                                               <tr>
