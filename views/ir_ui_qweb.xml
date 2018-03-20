@@ -43,60 +43,34 @@
                   </h2>
 
                   <t t-set="display_image" t-value="any([l.product_id.image_medium for l in doc.order_line])"/>
-
-                  <t t-foreach="doc.order_lines_layouted()" t-as="page">
-                      <table class="table table-condensed">
-                          <thead>
-                              <tr>
-                                  <th t-if="display_image"> </th>
-                                  <th>SKU</th>
-                                  <th>Description</th>
-                              </tr>
-                         </thead>
-                         <tbody class="sale_tbody">
-                              <t t-foreach="page" t-as="layout_category">
-
-                                  <t t-if="layout_category_size &gt; 1 or page_size &gt; 1" groups="sale.group_sale_layout">
-                                      <tr class="active">
-                                          <td colspan="7" style="font-weight: bold; border-bottom: 1px solid black;">&amp;bull;
-                                              <t t-esc="layout_category['name']"/>
-                                          </td>
-                                      </tr>
-                                  </t>
-                                  <!-- Lines associated -->
-                                  <t t-foreach="layout_category['lines']" t-as="l">
-                                      <tr>
-                                          <td width="30%" t-if="display_image"><img t-if="l.product_id.image_medium" t-att-src="'data:image/png;base64,'+l.product_id.image_medium" style="max-height: 80px;"/></td>
-                                          <td width="30%" style="white-space:nowrap;"><strong><span t-esc="str(l.product_id.code)"/></strong></td>
-                                          <td width="70%"><span t-field="l.name"/></td>
-                                      </tr>
-                                      <t t-set="pricelist_items" t-value="doc.pricelist_id.item_ids.filtered(lambda x: x.product_id.product_tmpl_id.id == l.product_id.product_tmpl_id.id)"/>
-                                      <tr t-if="pricelist_items">
-                                        <t t-foreach="pricelist_items.sorted(key=lambda r: r.min_quantity)" t-as="pli">
-                                            <tr>
-                                              <td><span t-field="pli.compute_price"/></td>
-                                              <td><span t-field="pli.min_quantity"/></td>
-                                              <td><span t-field="pli.fixed_price"/></td>
-                                            </tr>
-                                        </t>
-                                      </tr>
-                                      <t t-if="not pricelist_items">
-                                        <t t-set="global_pricelist_items" t-value="env['product.pricelist.item'].sudo().search([('product_id.product_tmpl_id','=',l.product_id.product_tmpl_id.id)])"/>
-                                        <tr t-if="global_pricelist_items">
-                                          <t t-foreach="global_pricelist_items.sorted(key=lambda r: r.min_quantity)" t-as="pli">
-                                              <tr>
-                                                <td><span t-field="pli.compute_price"/></td>
-                                                <td><span t-field="pli.min_quantity"/></td>
-                                                <td><span t-field="pli.fixed_price"/></td>
-                                              </tr>
-                                          </t>
-                                        </tr>
-                                      </t>
-                                  </t>
-                              </t>
-                          </tbody>
-                      </table>
-                  </t>
+                      <t t-foreach="doc.order_line" t-as="l">
+                          <t t-set="pricelist_items" t-value="doc.pricelist_id.item_ids.filtered(lambda x: x.product_tmpl_id.id == l.product_id.product_tmpl_id.id)"/>
+                          <t t-if="not pricelist_items" t-set="pricelist_items" t-value="env['product.pricelist.item'].sudo().search([('product_tmpl_id','=',l.product_id.product_tmpl_id.id)])"/>
+                          <t t-if="pricelist_items">
+                            <table class="table table-condensed">
+                              <thead>
+                                <th t-if="display_image"> </th>
+                                <th>SKU</th>
+                                <th>Description</th>
+                                <th>Qty</th>
+                                <th>Price</th>
+                              </thead>
+                              <tbody>
+                                <t t-set="index" t-value="0"/>
+                                <t t-foreach="pricelist_items.sorted(key=lambda r: r.min_quantity)" t-as="pli">
+                                    <tr>
+                                      <td width="30%" t-if="display_image"><img t-if="l.product_id.image_medium and index==0" t-att-src="'data:image/png;base64,'+l.product_id.image_medium" style="max-height: 80px;"/></td>
+                                      <td width="15%" style="white-space:nowrap;"><strong><span t-if="index == 0" t-esc="str(l.product_id.code)"/></strong></td>
+                                      <td width="35%"><span t-if="index == 0" t-field="l.name"/></td>
+                                      <td width="10%"><span t-field="pli.min_quantity"/></td>
+                                      <td width="10%"><span t-field="pli.fixed_price"/></td>
+                                    </tr>
+                                    <t t-set="index" t-value="index + 1"/>
+                                </t>
+                              </tbody>
+                          </table>
+                        </t>
+                      </t>
                   <p t-field="doc.note"/>
                   <div class="oe_structure"/>
               </div>
