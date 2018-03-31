@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <data>
+    <record model="ir.ui.menu" id="menu_sale_quotation">
+      <field name="parent_id" ref="sales_team.menu_base_partner"/>
+      <field name="name">Quotations</field>
+      <field name="sequence">1</field>
+      <field name="action" ref="action_sale_quotation"/>
+    </record>
+  </data>
+</odoo>

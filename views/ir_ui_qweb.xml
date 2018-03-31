@@ -18,60 +18,37 @@
                           <div t-field="doc.partner_id.name"/>
                           <div t-field="doc.partner_id" t-options="{&quot;widget&quot;: &quot;contact&quot;, &quot;fields&quot;: [&quot;address&quot;], &quot;no_marker&quot;: True}"/>
                       </div>
-                      <!--<div class="col-xs-4">
-                          <strong>Invoicing address:</strong>
-                          <div t-field="doc.partner_invoice_id.name"/>
-                          <div t-field="doc.partner_invoice_id" t-options="{&quot;widget&quot;: &quot;contact&quot;, &quot;fields&quot;: [&quot;address&quot;, &quot;phone&quot;, &quot;fax&quot;], &quot;no_marker&quot;: True, &quot;phone_icons&quot;: True}"/>
-                          <p t-if="doc.partner_id.vat">VAT: <span t-field="doc.partner_id.vat"/></p>
-                      </div>
-                      <div class="col-xs-4" t-if="doc.partner_shipping_id != doc.partner_invoice_id" >
-                          <strong>Shipping address:</strong>
-                              <div t-field="doc.partner_shipping_id.name"/>
-                              <div t-field="doc.partner_shipping_id" t-options="{&quot;widget&quot;: &quot;contact&quot;, &quot;fields&quot;: [&quot;address&quot;, &quot;phone&quot;, &quot;fax&quot;], &quot;no_marker&quot;: True, &quot;phone_icons&quot;: True}"/>
-                              <p t-if="doc.partner_id.vat">VAT: <span t-field="doc.partner_id.vat"/></p>
-                      </div>
-                       <div class="col-xs-4" t-if="doc.partner_shipping_id == doc.partner_invoice_id">
-                          <strong>Shipping address:</strong>
-                          <div t-field="doc.partner_invoice_id.name"/>
-                          <div t-field="doc.partner_invoice_id" t-options="{&quot;widget&quot;: &quot;contact&quot;, &quot;fields&quot;: [&quot;address&quot;, &quot;phone&quot;, &quot;fax&quot;], &quot;no_marker&quot;: True, &quot;phone_icons&quot;: True}"/>
-                          <p t-if="doc.partner_id.vat">VAT: <span t-field="doc.partner_id.vat"/></p>
-                      </div>-->
                   </div>
 
                   <h2>
                       <span>Speedhut Quotation</span>
                   </h2>
 
-                  <t t-set="display_image" t-value="any([l.product_id.image_medium for l in doc.order_line])"/>
-                      <t t-foreach="doc.order_line" t-as="l">
-                          <t t-set="pricelist_items" t-value="doc.pricelist_id.item_ids.filtered(lambda x: x.product_tmpl_id.id == l.product_id.product_tmpl_id.id)"/>
-                          <t t-if="not pricelist_items" t-set="pricelist_items" t-value="env['product.pricelist.item'].sudo().search([('product_tmpl_id','=',l.product_id.product_tmpl_id.id)])"/>
-                          <t t-if="pricelist_items">
-                            <table class="table table-condensed">
-                              <thead>
-                                <th t-if="display_image"> </th>
-                                <th>SKU</th>
-                                <th>Description</th>
-                                <th>Qty</th>
-                                <th>Price</th>
-                              </thead>
-                              <tbody>
-                                <t t-set="index" t-value="0"/>
-                                <t t-foreach="pricelist_items.sorted(key=lambda r: r.min_quantity)" t-as="pli">
-                                    <tr>
-                                      <td width="30%" t-if="display_image"><img t-if="l.product_id.image_medium and index==0" t-att-src="'data:image/png;base64,'+l.product_id.image_medium" style="max-height: 80px;"/></td>
-                                      <td width="15%" style="white-space:nowrap;"><strong><span t-if="index == 0" t-esc="str(l.product_id.code)"/></strong></td>
-                                      <td width="35%"><span t-if="index == 0" t-field="l.name"/></td>
-                                      <td width="10%"><span t-field="pli.min_quantity"/></td>
-                                      <td width="10%"><span t-field="pli.fixed_price"/></td>
-                                    </tr>
-                                    <t t-set="index" t-value="index + 1"/>
-                                </t>
-                              </tbody>
-                          </table>
+                  <t t-set="display_image" t-value="any([l.product_id.image_medium for l in doc.quotation_line_ids])"/>
+
+                  <table class="table table-condensed">
+                      <thead>
+                        <th t-if="display_image"> </th>
+                        <th>SKU</th>
+                        <th>Description</th>
+                        <th>Qty</th>
+                        <th>Price</th>
+                      </thead>
+                      <tbody>
+                        <t t-set="unique_products" t-value="[]"/>
+                        <t t-foreach="doc.quotation_line_ids"  t-as="l">
+                            <tr>
+                              <td width="30%" t-if="display_image"><img t-if="l.product_id.image_medium and l.product_id.id not in unique_products" t-att-src="'data:image/png;base64,'+l.product_id.image_medium" style="max-height: 80px;"/></td>
+                              <td width="15%" style="white-space:nowrap;"><strong><span t-if="l.product_id.id not in unique_products" t-esc="str(l.product_id.code)"/></strong></td>
+                              <td width="35%"><span t-if="l.product_id.id not in unique_products" t-field="l.name"/></td>
+                              <td width="10%"><span t-field="l.min_quantity"/></td>
+                              <td width="10%"><span t-field="l.price"/></td>
+                            </tr>
+                            <t t-set="unique_products" t-value="unique_products + [l.product_id.id]"/>
                         </t>
-                      </t>
-                  <p t-field="doc.note"/>
+                      </tbody>
+                  </table>
+                  <p t-field="doc.notes"/>
                   <div class="oe_structure"/>
               </div>
           </t>
@@ -85,7 +62,7 @@
     <field name="inherit_id" eval="False"/>
     <field name="priority">16</field>
     <field name="arch" type="xml">
-      <t t-name="sale_lfo.report_speedhut_quotation">
+      <t t-name="sh_sale_mod.report_speedhut_quotation">
           <t t-call="report.html_container">
               <t t-foreach="docs" t-as="doc">
                   <t t-call="sh_sale_mod.report_speedhut_quotation_document" t-lang="doc.partner_id.lang"/>
@@ -97,12 +74,12 @@
   <record model="ir.actions.report.xml" id="report_report_speedhut_quotation">
     <field name="name">Speedhut Quotation</field>
     <field name="report_type">qweb-pdf</field>
-    <field name="model">sale.order</field>
+    <field name="model">sale.quotation</field>
     <field name="report_name">sh_sale_mod.report_speedhut_quotation</field>
   </record>
   <record model="ir.values" id="value_print_report_report_speedhut_quotation">
       <field name="name">Speedhut Quotation</field>
-      <field name="model">sale.order</field>
+      <field name="model">sale.quotation</field>
       <field name="key2">client_print_multi</field>
       <field name="value" eval="'ir.actions.report.xml,'+str(ref('report_report_speedhut_quotation'))"/>
     </record>

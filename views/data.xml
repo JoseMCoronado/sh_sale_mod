@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <record model="mail.template" id="mail_template_sale_quotation">
+    <field name="name">Sale Quotation Email Template</field>
+    <field name="model_id" ref="sh_sale_mod.model_sale_quotation"/>
+    <field name="report_template" ref="report_report_speedhut_quotation"/>
+  </record>
+  <record model="ir.sequence" id="sequence_quotation">
+    <field name="name">Quotation Sequence</field>
+    <field name="implementation">standard</field>
+    <field name="code">sale.quotation.sequence</field>
+    <field name="prefix">Q/</field>
+    <field name="padding" eval="4"/>
+    <field name="number_increment" eval="1"/>
+  </record>
+</odoo>

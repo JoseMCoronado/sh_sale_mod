@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <data>
+    <record model="ir.ui.view" id="view_sale_quotation_form">
+        <field name="name">x_gfp.sale.quotation.form</field>
+        <field name="model">sale.quotation</field>
+        <field name="inherit_id" eval="False"/>
+        <field name="priority">16</field>
+        <field name="groups_id" eval="[(6, 0, [])]"/>
+        <field name="type">form</field>
+        <field name="mode">primary</field>
+        <field name="arch" type="xml">
+          <form>
+            <header>
+              <button name="action_order_send" type="object" string="Send by Mail" class="oe_highlight"/>
+            </header>
+            <sheet>
+              <div class="oe_title">
+                <h1><field name="name"/></h1>
+              </div>
+              <group>
+                <group>
+                  <field name="partner_id"/>
+                </group>
+                <group>
+                  <field name="reference"/>
+                  <field name="notes"/>
+                </group>
+              </group>
+              <notebook>
+                <page string="Quotation Lines">
+                  <button name="open_add_line" type="object" string="Add Line" class="oe_highlight"/>
+                  <group>
+                    <field name="quotation_line_ids" widget="one2many_list" nolabel="1">
+                      <tree editable="bottom">
+                        <field name="quotation_id" invisible="1"/>
+                        <field name="item_id" invisible="1"/>
+                        <field name="sequence" widget="handle"/>
+                        <field name="product_id"/>
+                        <field name="name"/>
+                        <field name="min_quantity"/>
+                        <field name="original_price"/>
+                        <field name="price"/>
+                      </tree>
+                    </field>
+                  </group>
+                </page>
+              </notebook>
+            </sheet>
+            <div class="oe_chatter">
+              <field name="message_follower_ids" widget="mail_followers"/>
+              <field name="message_ids" widget="mail_thread"/>
+            </div>
+          </form>
+        </field>
+    </record>
+    <record model="ir.ui.view" id="view_sale_quotation_tree">
+          <field name="name">x_gfp.sale.quotation.tree</field>
+          <field name="model">sale.quotation</field>
+          <field name="inherit_id" eval="False"/>
+          <field name="priority">16</field>
+          <field name="groups_id" eval="[(6, 0, [])]"/>
+          <field name="type">tree</field>
+          <field name="mode">primary</field>
+          <field name="arch" type="xml">
+            <tree>
+              <field name="name"/>
+              <field name="partner_id"/>
+              <field name="reference"/>
+              <field name="notes"/>
+            </tree>
+          </field>
+    </record>
+    <record model="ir.ui.view" id="view_add_sale_quotation_line">
+          <field name="name">x_gfp.add.sale.quotation.line.form</field>
+          <field name="model">add.sale.quotation.line</field>
+          <field name="inherit_id" eval="False"/>
+          <field name="priority">16</field>
+          <field name="groups_id" eval="[(6, 0, [])]"/>
+          <field name="type">form</field>
+          <field name="mode">primary</field>
+          <field name="arch" type="xml">
+            <form>
+                <group>
+                  <field name="product_id"/>
+                  <field name="pricelist_ids" widget="many2many_tags"/>
+                </group>
+                <footer>
+                    <button name="add_sale_quotation_lines" string="Add Line" type="object" class="btn-primary"/>
+                    <button string="Cancel" class="btn-default" special="cancel" />
+                </footer>
+            </form>
+          </field>
+    </record>
+  </data>
+</odoo>

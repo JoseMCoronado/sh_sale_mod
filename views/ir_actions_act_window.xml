@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <data>
+    <record model="ir.actions.act_window" id="action_add_sale_quotation">
+      <field name="auto_search" eval="True"/>
+      <field name="context">{}</field>
+      <field name="groups_id" eval="[(6, 0, [])]"/>
+      <field name="limit">80</field>
+      <field name="name">Add Quotation Line</field>
+      <field name="res_model">add.sale.quotation.line</field>
+      <field name="target">new</field>
+      <field name="type">ir.actions.act_window</field>
+      <field name="view_id" eval="False"/>
+      <field name="view_ids" eval="[(6, 0, [])]"/>
+      <field name="view_mode">form</field>
+      <field name="view_type">form</field>
+    </record>
+    <record model="ir.actions.act_window" id="action_sale_quotation">
+      <field name="auto_search" eval="True"/>
+      <field name="context">{}</field>
+      <field name="groups_id" eval="[(6, 0, [])]"/>
+      <field name="limit">80</field>
+      <field name="name">Sale Quotation</field>
+      <field name="res_model">sale.quotation</field>
+      <field name="target">current</field>
+      <field name="type">ir.actions.act_window</field>
+      <field name="view_id" eval="False"/>
+      <field name="view_ids" eval="[(6, 0, [])]"/>
+      <field name="view_mode">tree,form</field>
+      <field name="view_type">form</field>
+    </record>
+  </data>
+</odoo>
