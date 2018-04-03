@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from odoo import api, fields, models, _
+from odoo.exceptions import UserError
 
 class SaleQuotation(models.Model):
     _name = "sale.quotation"
@@ -13,6 +14,14 @@ class SaleQuotation(models.Model):
     partner_id = fields.Many2one('res.partner', string="Customer")
     notes = fields.Text(string="Notes")
     quotation_line_ids = fields.One2many('sale.quotation.line','quotation_id', string="Quotation Lines", store=True)
+    destination_pricelist_id = fields.Many2one('product.pricelist',string="Destination Pricelist")
+    show_add = fields.Boolean('Show (Technical)',compute="_show_add_button", store=False,readonly=True)
+
+    @api.multi
+    def _show_add_button(self):
+        for record in self:
+            if any(not l.item_id for l in record.quotation_line_ids):
+                record.show_add = True
 
     @api.model
     def create(self, vals):
@@ -20,6 +29,26 @@ class SaleQuotation(models.Model):
             vals['name'] = self.env['ir.sequence'].next_by_code('sale.quotation.sequence') or _('New')
         result = super(SaleQuotation, self).create(vals)
         return result
+
+    @api.multi
+    def add_pricelist_items(self):
+        for record in self:
+            if record.destination_pricelist_id:
+                print record.quotation_line_ids.filtered(lambda x: not x.item_id)
+                for line in record.quotation_line_ids.filtered(lambda x: not x.item_id):
+                    data = {
+                        'product_tmpl_id': line.product_id.product_tmpl_id.id,
+                        'applied_on': '1_product',
+                        'min_quantity': line.min_quantity,
+                        'compute_price': line.compute_price,
+                        'fixed_price': line.fixed_price,
+                        'percent_price': line.fixed_price,
+                        'pricelist_id': record.destination_pricelist_id.id,
+                    }
+                    newitem = record.env['product.pricelist.item'].create(data)
+                    line.write({'item_id':newitem.id})
+            else:
+                raise UserError(_('Destination pricelist has not been set.'))
 
     @api.multi
     def open_add_line(self):
@@ -69,10 +98,32 @@ class SaleQuotationLine(models.Model):
     name = fields.Char('Description',related="product_id.name", readonly="True",store="True")
     original_price = fields.Float(string='Orig. Price',releated="product_id.lst_price", readonly="True",store="True" )
     min_quantity = fields.Float(string='Min. Qty')
-    price = fields.Char(string="Price")
+    price = fields.Char('Price', compute='_get_pricelist_item_name_price', help="Explicit rule name for this pricelist line.")
     item_id = fields.Many2one('product.pricelist.item',string="Pricelist Items")
-
     sequence = fields.Integer('Sequence', default=1)
+    compute_price = fields.Selection([
+        ('fixed', 'Fixed Price'),
+        ('percentage', 'Percent (Discount)'),
+        ], string='Compute Method', copy=False)
+    fixed_price = fields.Float(string='Fixed Price')
+    percent_price = fields.Float(string='Percent Price (%)')
+
+    @api.one
+    @api.depends('product_id', 'compute_price', 'fixed_price', 'percent_price')
+    def _get_pricelist_item_name_price(self):
+        if self.compute_price == 'fixed':
+            self.price = ("%s USD") % (self.fixed_price)
+        elif self.compute_price == 'percentage':
+            self.price = _("%s %% discount") % (self.percent_price)
+        else:
+            self.price = " "
+
+    @api.onchange('compute_price')
+    def _onchange_compute_price(self):
+        if self.compute_price != 'fixed':
+            self.fixed_price = 0.0
+        if self.compute_price != 'percentage':
+            self.percent_price = 0.0
 
 class AddSaleQuotationLine(models.TransientModel):
     _name = "add.sale.quotation.line"
@@ -95,7 +146,9 @@ class AddSaleQuotationLine(models.TransientModel):
                         data = {
                             'product_id': record.product_id.id,
                             'min_quantity': line.min_quantity,
-                            'price': line.price,
+                            'compute_price': line.compute_price,
+                            'fixed_price': line.fixed_price,
+                            'percent_price': line.percent_price,
                             'item_id': line.id,
                         }
                         new_line = new_lines.new(data)
@@ -106,7 +159,8 @@ class AddSaleQuotationLine(models.TransientModel):
                     data = {
                         'product_id': record.product_id.id,
                         'min_quantity': 1,
-                        'price': str(round(record.product_id.list_price,2))+' USD',
+                        'compute_price': 'fixed',
+                        'fixed_price': record.product_id.list_price,
                     }
                     new_line = new_lines.new(data)
                     new_lines += new_line

@@ -13,6 +13,8 @@
           <form>
             <header>
               <button name="action_order_send" type="object" string="Send by Mail" class="oe_highlight"/>
+              <button name="add_pricelist_items" type="object" string="Add Items to Pricelist" attrs="{'invisible':[('show_add','!=',True)]}"/>
+
             </header>
             <sheet>
               <div class="oe_title">
@@ -21,9 +23,11 @@
               <group>
                 <group>
                   <field name="partner_id"/>
+                  <field name="show_add" invisible="1"/>
                 </group>
                 <group>
                   <field name="reference"/>
+                  <field name="destination_pricelist_id"/>
                   <field name="notes"/>
                 </group>
               </group>
@@ -40,7 +44,10 @@
                         <field name="name"/>
                         <field name="min_quantity"/>
                         <field name="original_price"/>
-                        <field name="price"/>
+                        <field name="compute_price"/>
+                        <field name="fixed_price" attrs="{'readonly':[('compute_price','!=','fixed')]}"/>
+                        <field name="percent_price" attrs="{'readonly':[('compute_price','!=','percentage')]}"/>
+                        <field name="price" readonly="1"/>
                       </tree>
                     </field>
                   </group>
