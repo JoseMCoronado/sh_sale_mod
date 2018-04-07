@@ -12,7 +12,7 @@ class ResPartner(models.Model):
     def _get_quotation_count(self):
         for record in self:
             quotations = record.env['sale.quotation'].search([('partner_id','=',record.id)])
-            record.quotation_count = len(repairs)
+            record.quotation_count = len(quotations)
 
     @api.multi
     def open_quotations(self):
