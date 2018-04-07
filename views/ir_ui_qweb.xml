@@ -83,4 +83,87 @@
       <field name="key2">client_print_multi</field>
       <field name="value" eval="'ir.actions.report.xml,'+str(ref('report_report_speedhut_quotation'))"/>
     </record>
+    <record model="ir.ui.view" id="report_speedhut_pricelist_document">
+        <field name="name">report_speedhut_pricelist_document</field>
+        <field name="type">qweb</field>
+        <field name="model" eval="False"/>
+        <field name="inherit_id" eval="False"/>
+        <field name="priority">16</field>
+        <field name="arch" type="xml">
+          <t t-name="sh_sale_mod.report_speedhut_pricelist_document">
+              <t t-call="report.external_layout">
+                  <t t-set="doc" t-value="doc.with_context({'lang':doc.partner_id.lang})"/>
+                  <div class="page">
+                      <div class="oe_structure"/>
+                      <div class="row">
+                          <div class="col-xs-4" t-if="doc.partner_id">
+                              <strong>Customer:</strong>
+                              <div t-field="doc.partner_id.name"/>
+                              <div t-field="doc.partner_id" t-options="{&quot;widget&quot;: &quot;contact&quot;, &quot;fields&quot;: [&quot;address&quot;], &quot;no_marker&quot;: True}"/>
+                          </div>
+                      </div>
+
+                      <h2>
+                          <span>Speedhut Quotation</span>
+                      </h2>
+
+                      <t t-set="display_image" t-value="any([l.product_tmpl_id.image_medium for l in doc.item_ids])"/>
+
+                      <table class="table table-condensed">
+                          <thead>
+                            <th t-if="display_image"> </th>
+                            <th>SKU</th>
+                            <th>Description</th>
+                            <th>Qty</th>
+                            <th>Price</th>
+                          </thead>
+                          <tbody>
+                            <t t-set="unique_products" t-value="[]"/>
+                            <t t-foreach="doc.item_ids"  t-as="l">
+                                <tr>
+                                  <td width="30%" t-if="display_image"><img t-if="l.product_tmpl_id.image_medium and l.product_tmpl_id.id not in unique_products" t-att-src="'data:image/png;base64,'+l.product_tmpl_id.image_medium" style="max-height: 80px;"/></td>
+                                  <td width="15%" style="white-space:nowrap;"><strong><span t-if="l.product_tmpl_id.id not in unique_products" t-esc="str(l.product_tmpl_id.default_code)"/></strong></td>
+                                  <td width="35%"><span t-if="l.product_tmpl_id.id not in unique_products" t-field="l.product_tmpl_id.name"/></td>
+                                  <td width="10%"><span t-field="l.min_quantity"/></td>
+                                  <td width="10%"><span t-field="l.price"/></td>
+                                </tr>
+                                <t t-set="unique_products" t-value="unique_products + [l.product_tmpl_id.id]"/>
+                            </t>
+                          </tbody>
+                      </table>
+                      <div t-field="doc.notes"/>
+                      <div class="oe_structure"/>
+                  </div>
+              </t>
+          </t>
+        </field>
+    </record>
+    <record model="ir.ui.view" id="report_speedhut_pricelist">
+        <field name="name">report_speedhut_pricelist</field>
+        <field name="type">qweb</field>
+        <field name="model" eval="False"/>
+        <field name="inherit_id" eval="False"/>
+        <field name="priority">16</field>
+        <field name="arch" type="xml">
+          <t t-name="sh_sale_mod.report_speedhut_pricelist">
+              <t t-call="report.html_container">
+                  <t t-foreach="docs" t-as="doc">
+                      <t t-call="sh_sale_mod.report_speedhut_pricelist_document" t-lang="doc.partner_id.lang"/>
+                  </t>
+              </t>
+          </t>
+        </field>
+      </record>
+      <record model="ir.actions.report.xml" id="report_report_speedhut_pricelist">
+        <field name="name">Speedhut Pricelist</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="model">product.pricelist</field>
+        <field name="report_name">sh_sale_mod.report_speedhut_pricelist</field>
+      </record>
+      <record model="ir.values" id="value_print_report_report_speedhut_pricelist">
+          <field name="name">Speedhut Pricelist</field>
+          <field name="model">product.pricelist</field>
+          <field name="key2">client_print_multi</field>
+          <field name="value" eval="'ir.actions.report.xml,'+str(ref('report_report_speedhut_pricelist'))"/>
+        </record>
 </odoo>

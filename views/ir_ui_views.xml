@@ -14,7 +14,7 @@
             <header>
               <button name="action_order_send" type="object" string="Send by Mail" class="oe_highlight"/>
               <button name="add_pricelist_items" type="object" string="Add Items to Pricelist" attrs="{'invisible':[('show_add','!=',True)]}"/>
-
+              <button name="modify_pricelist_items" type="object" string="Update Pricelist Items" attrs="{'invisible':[('show_modify','!=',True)]}"/>
             </header>
             <sheet>
               <div class="oe_title">
@@ -23,7 +23,9 @@
               <group>
                 <group>
                   <field name="partner_id"/>
+                  <field name="create_date"/>
                   <field name="show_add" invisible="1"/>
+                  <field name="show_modify" invisible="1"/>
                 </group>
                 <group>
                   <field name="reference"/>
@@ -48,6 +50,7 @@
                         <field name="fixed_price" attrs="{'readonly':[('compute_price','!=','fixed')]}"/>
                         <field name="percent_price" attrs="{'readonly':[('compute_price','!=','percentage')]}"/>
                         <field name="price" readonly="1"/>
+                        <button name="delete_from_pricelist" type="object" string="DELETE FROM LIST" attrs="{'invisible':[('item_id','=',False)]}"/>
                       </tree>
                     </field>
                   </group>
@@ -71,6 +74,7 @@
           <field name="mode">primary</field>
           <field name="arch" type="xml">
             <tree>
+              <field name="create_date"/>
               <field name="name"/>
               <field name="partner_id"/>
               <field name="reference"/>
@@ -98,6 +102,33 @@
                 </footer>
             </form>
           </field>
+    </record>
+    <record model="ir.ui.view" id="view_partner_form_mod">
+      <field name="name">x_gfp.res.partner.form.mod</field>
+      <field name="model">res.partner</field>
+      <field name="inherit_id" ref="base.view_partner_form"/>
+      <field name="priority">99</field>
+      <field name="arch" type="xml">
+        <xpath expr="//div[@name='button_box']" position="inside">
+          <button class="oe_stat_button" type="object" name="open_quotations" attrs="{'invisible': [('customer', '=', False)]}" icon="fa-usd">
+              <field string="Quotations" name="quotation_count" widget="statinfo"/>
+          </button>
+        </xpath>
+      </field>
+    </record>
+    <record model="ir.ui.view" id="product_pricelist_view_mod">
+      <field name="name">x_gfp.product.pricelist.form.mod</field>
+      <field name="model">product.pricelist</field>
+      <field name="inherit_id" ref="product.product_pricelist_view"/>
+      <field name="priority">99</field>
+      <field name="arch" type="xml">
+        <xpath expr="//field[@name='currency_id']" position="before">
+          <field name="partner_id"/>
+        </xpath>
+        <xpath expr="//field[@name='country_group_ids']" position="after">
+          <field name="notes"/>
+        </xpath>
+      </field>
     </record>
   </data>
 </odoo>

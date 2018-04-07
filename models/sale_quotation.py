@@ -10,18 +10,21 @@ class SaleQuotation(models.Model):
     _inherit = ['mail.thread']
 
     name = fields.Char(string='Quotation #', required=True, copy=False, readonly=True, index=True, default=lambda self: _('New'))
-    reference = fields.Char(string="External Reference")
-    partner_id = fields.Many2one('res.partner', string="Customer")
-    notes = fields.Text(string="Notes")
-    quotation_line_ids = fields.One2many('sale.quotation.line','quotation_id', string="Quotation Lines", store=True)
-    destination_pricelist_id = fields.Many2one('product.pricelist',string="Destination Pricelist")
-    show_add = fields.Boolean('Show (Technical)',compute="_show_add_button", store=False,readonly=True)
+    reference = fields.Char(string="Internal Reference",tracking="onchange")
+    partner_id = fields.Many2one('res.partner', string="Customer",tracking="onchange",required=True)
+    notes = fields.Text(string="Message for Customers",tracking="onchange")
+    quotation_line_ids = fields.One2many('sale.quotation.line','quotation_id', string="Quotation Lines", store=True,tracking="onchange")
+    destination_pricelist_id = fields.Many2one('product.pricelist',string="Destination Pricelist",tracking="onchange",required=True)
+    show_add = fields.Boolean('Show Add (Technical)',compute="_show_add_button", store=False,readonly=True)
+    show_modify = fields.Boolean('Show Modify(Technical)',compute="_show_add_button", store=False,readonly=True)
 
     @api.multi
     def _show_add_button(self):
         for record in self:
             if any(not l.item_id for l in record.quotation_line_ids):
                 record.show_add = True
+            if any(l.item_id for l in record.quotation_line_ids):
+                record.show_modify = True
 
     @api.model
     def create(self, vals):
@@ -34,7 +37,6 @@ class SaleQuotation(models.Model):
     def add_pricelist_items(self):
         for record in self:
             if record.destination_pricelist_id:
-                print record.quotation_line_ids.filtered(lambda x: not x.item_id)
                 for line in record.quotation_line_ids.filtered(lambda x: not x.item_id):
                     data = {
                         'product_tmpl_id': line.product_id.product_tmpl_id.id,
@@ -51,11 +53,33 @@ class SaleQuotation(models.Model):
                 raise UserError(_('Destination pricelist has not been set.'))
 
     @api.multi
+    def modify_pricelist_items(self):
+        for record in self:
+            if record.destination_pricelist_id:
+                for line in record.quotation_line_ids.filtered(lambda x: x.item_id):
+                    data = {
+                        'product_tmpl_id': line.product_id.product_tmpl_id.id,
+                        'applied_on': '1_product',
+                        'min_quantity': line.min_quantity,
+                        'compute_price': line.compute_price,
+                        'fixed_price': line.fixed_price,
+                        'percent_price': line.fixed_price,
+                        'pricelist_id': record.destination_pricelist_id.id,
+                    }
+                    line.item_id.write(data)
+            else:
+                raise UserError(_('Destination pricelist has not been set.'))
+
+    @api.multi
     def open_add_line(self):
         for record in self:
-            pricelists = record.env['product.pricelist'].search([])
+            pricelist = []
+            if record.partner_id.property_product_pricelist:
+                pricelist.append(record.partner_id.property_product_pricelist.id)
+            if record.destination_pricelist_id.id:
+                pricelist.append(record.destination_pricelist_id.id)
             action_data = record.env.ref('sh_sale_mod.action_add_sale_quotation').read()[0]
-            action_data.update({'context':{'default_quotation_id':record.id,'default_pricelist_ids':[(6,0,pricelists.ids)]}})
+            action_data.update({'context':{'default_quotation_id':record.id,'default_pricelist_ids':[(6,0,pricelist)]}})
             return action_data
 
     @api.multi
@@ -114,7 +138,9 @@ class SaleQuotationLine(models.Model):
         if self.compute_price == 'fixed':
             self.price = ("%s USD") % (self.fixed_price)
         elif self.compute_price == 'percentage':
-            self.price = _("%s %% discount") % (self.percent_price)
+            listp = self.product_id.product_tmpl_id.list_price
+            newprice = listp - ((self.percent_price/100)*listp)
+            self.price = ("%s USD") % (newprice)
         else:
             self.price = " "
 
@@ -124,6 +150,13 @@ class SaleQuotationLine(models.Model):
             self.fixed_price = 0.0
         if self.compute_price != 'percentage':
             self.percent_price = 0.0
+
+    @api.multi
+    def delete_from_pricelist(self):
+        for record in self:
+            if record.item_id:
+                record.item_id.sudo().unlink()
+                record.sudo().unlink()
 
 class AddSaleQuotationLine(models.TransientModel):
     _name = "add.sale.quotation.line"
@@ -137,19 +170,21 @@ class AddSaleQuotationLine(models.TransientModel):
     def add_sale_quotation_lines(self):
         for record in self:
             if record.quotation_id:
-                print record.pricelist_ids
                 pricelist_items = record.pricelist_ids.mapped('item_ids').filtered(lambda r: r.product_tmpl_id == record.product_id.product_tmpl_id)
-                print pricelist_items
                 if pricelist_items:
                     new_lines = record.env['sale.quotation.line']
                     for line in pricelist_items - record.quotation_id.quotation_line_ids.mapped('item_id'):
+                        if line.pricelist_id == record.quotation_id.destination_pricelist_id:
+                            item = line.id
+                        else:
+                            item = False
                         data = {
                             'product_id': record.product_id.id,
                             'min_quantity': line.min_quantity,
                             'compute_price': line.compute_price,
                             'fixed_price': line.fixed_price,
                             'percent_price': line.percent_price,
-                            'item_id': line.id,
+                            'item_id': item,
                         }
                         new_line = new_lines.new(data)
                         new_lines += new_line
