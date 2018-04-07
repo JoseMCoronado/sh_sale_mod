@@ -34,12 +34,12 @@ RESPONSIBILITY FOR ANY BEHAVIOR ONCE INSTALLED.
 
     'depends':['base','sale','crm','delivery','purchase','stock','stock_picking_wave','delivery','stock_landed_costs','stock_barcode','helpdesk','mrp_repair'],
     'data':[
-            'views/data.xml',
             'views/ir_ui_qweb.xml',
             'views/ir_ui_views.xml',
             'views/ir_actions_act_window.xml',
             'views/ir_ui_menu.xml',
             'views/ir_model_access.xml',
+            'views/data.xml',
             ],
     'installable': True,
 }
