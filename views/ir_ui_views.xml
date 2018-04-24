@@ -48,8 +48,8 @@
                         <field name="min_quantity"/>
                         <field name="original_price"/>
                         <field name="compute_price"/>
-                        <field name="fixed_price" attrs="{'readonly':[('compute_price','!=','fixed')]}"/>
-                        <field name="percent_price" attrs="{'readonly':[('compute_price','!=','percentage')]}"/>
+                        <field name="fixed_price" />
+                        <field name="percent_price" />
                         <field name="price" readonly="1"/>
                         <button name="delete_from_pricelist" type="object" string="DELETE FROM LIST" attrs="{'invisible':[('item_id','=',False)]}"/>
                       </tree>

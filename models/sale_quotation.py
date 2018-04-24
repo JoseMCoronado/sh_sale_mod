@@ -45,7 +45,7 @@ class SaleQuotation(models.Model):
                         'min_quantity': line.min_quantity,
                         'compute_price': line.compute_price,
                         'fixed_price': line.fixed_price,
-                        'percent_price': line.fixed_price,
+                        'percent_price': line.percent_price,
                         'pricelist_id': record.destination_pricelist_id.id,
                     }
                     newitem = record.env['product.pricelist.item'].create(data)
@@ -64,7 +64,7 @@ class SaleQuotation(models.Model):
                         'min_quantity': line.min_quantity,
                         'compute_price': line.compute_price,
                         'fixed_price': line.fixed_price,
-                        'percent_price': line.fixed_price,
+                        'percent_price': line.percent_price,
                         'pricelist_id': record.destination_pricelist_id.id,
                     }
                     line.item_id.write(data)
@@ -158,6 +158,10 @@ class SaleQuotationLine(models.Model):
             if record.item_id:
                 record.item_id.sudo().unlink()
                 record.sudo().unlink()
+                return {
+                    'type': 'ir.actions.client',
+                    'tag': 'reload'
+                }
 
 class AddSaleQuotationLine(models.TransientModel):
     _name = "add.sale.quotation.line"
