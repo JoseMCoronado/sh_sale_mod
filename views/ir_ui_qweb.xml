@@ -31,16 +31,19 @@
                         <th t-if="display_image"> </th>
                         <th>SKU</th>
                         <th>Description</th>
+                        <th t-if="doc.display_msrp == True">MSRP</th>
                         <th>Qty</th>
                         <th>Price</th>
                       </thead>
                       <tbody>
                         <t t-set="unique_products" t-value="[]"/>
-                        <t t-foreach="doc.quotation_line_ids"  t-as="l">
+                        <t t-foreach="doc.quotation_line_ids.sorted(key=lambda b: (b.product_id.name,b.min_quantity))"  t-as="l">
                             <tr>
                               <td width="30%" t-if="display_image"><img t-if="l.product_id.image_medium and l.product_id.id not in unique_products" t-att-src="'data:image/png;base64,'+l.product_id.image_medium" style="max-height: 80px;"/></td>
                               <td width="15%" style="white-space:nowrap;"><strong><span t-if="l.product_id.id not in unique_products" t-esc="str(l.product_id.code)"/></strong></td>
                               <td width="35%"><span t-if="l.product_id.id not in unique_products" t-field="l.name"/></td>
+                              <td width="10%" t-if="doc.display_msrp == True and l.product_id.id not in unique_products"><span t-field="l.original_price"/></td>
+                              <td t-if="doc.display_msrp == True and l.product_id.id in unique_products"> </td>
                               <td width="10%"><span t-field="l.min_quantity"/></td>
                               <td width="10%"><span t-field="l.price"/></td>
                             </tr>
@@ -91,7 +94,10 @@
         <field name="priority">16</field>
         <field name="arch" type="xml">
           <t t-name="sh_sale_mod.report_speedhut_pricelist_document">
-              <t t-call="report.external_layout">
+              <t>
+                <!-- Multicompany -->
+                  <t t-set="company" t-value="user.company_id"/>
+                  <t t-call="report.external_layout_header"/>
                   <t t-set="doc" t-value="doc.with_context({'lang':doc.partner_id.lang})"/>
                   <div class="page">
                       <div class="oe_structure"/>
@@ -119,7 +125,8 @@
                           </thead>
                           <tbody>
                             <t t-set="unique_products" t-value="[]"/>
-                            <t t-foreach="doc.item_ids"  t-as="l">
+                            <t t-foreach="doc.item_ids.sorted(key=lambda b: (b.product_tmpl_id.name,b.min_quantity))"  t-as="l">
+                              <t t-if="l.product_tmpl_id">
                                 <tr>
                                   <td width="30%" t-if="display_image"><img t-if="l.product_tmpl_id.image_medium and l.product_tmpl_id.id not in unique_products" t-att-src="'data:image/png;base64,'+l.product_tmpl_id.image_medium" style="max-height: 80px;"/></td>
                                   <td width="15%" style="white-space:nowrap;"><strong><span t-if="l.product_tmpl_id.id not in unique_products" t-esc="str(l.product_tmpl_id.default_code)"/></strong></td>
@@ -128,12 +135,14 @@
                                   <td width="10%"><span t-field="l.price"/></td>
                                 </tr>
                                 <t t-set="unique_products" t-value="unique_products + [l.product_tmpl_id.id]"/>
+                              </t>
                             </t>
                           </tbody>
                       </table>
                       <div t-field="doc.notes"/>
                       <div class="oe_structure"/>
                   </div>
+                  <t t-call="report.external_layout_footer"/>
               </t>
           </t>
         </field>

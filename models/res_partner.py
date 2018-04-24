@@ -6,7 +6,7 @@ from odoo.exceptions import UserError
 class ResPartner(models.Model):
     _inherit = "res.partner"
 
-    quotation_count = fields.Integer(string="Quotations")
+    quotation_count = fields.Integer(string="Quotations",compute="_get_quotation_count", store=False,readonly=True)
 
     @api.multi
     def _get_quotation_count(self):

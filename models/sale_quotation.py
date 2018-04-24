@@ -17,6 +17,7 @@ class SaleQuotation(models.Model):
     destination_pricelist_id = fields.Many2one('product.pricelist',string="Destination Pricelist",tracking="onchange",required=True)
     show_add = fields.Boolean('Show Add (Technical)',compute="_show_add_button", store=False,readonly=True)
     show_modify = fields.Boolean('Show Modify(Technical)',compute="_show_add_button", store=False,readonly=True)
+    display_msrp = fields.Boolean('Display MSRP')
 
     @api.multi
     def _show_add_button(self):
@@ -120,7 +121,7 @@ class SaleQuotationLine(models.Model):
     quotation_id = fields.Many2one('sale.quotation', string="Quotation")
     product_id = fields.Many2one('product.product', string="Product")
     name = fields.Char('Description',related="product_id.name", readonly="True",store="True")
-    original_price = fields.Float(string='Orig. Price',releated="product_id.lst_price", readonly="True",store="True" )
+    original_price = fields.Float(string='Orig. Price',related="product_id.lst_price", readonly=True,store=False)
     min_quantity = fields.Float(string='Min. Qty')
     price = fields.Char('Price', compute='_get_pricelist_item_name_price', help="Explicit rule name for this pricelist line.")
     item_id = fields.Many2one('product.pricelist.item',string="Pricelist Items")
