@@ -7,5 +7,14 @@
       <field name="sequence">1</field>
       <field name="action" ref="action_sale_quotation"/>
     </record>
+      <record model="ir.ui.menu" id="menu_delivery_service_code">
+      <field name="action" ref="sh_sale_mod.action_delivery_service_code"/>
+      <field name="active" eval="True"/>
+      <field name="groups_id" eval="[(6, 0, [])]"/>
+      <field name="name">Delivery Service Codes</field>
+      <field name="parent_id" ref="delivery.menu_delivery"/>
+      <field name="sequence">7</field>
+      <field name="web_icon" eval="False"/>
+    </record>
   </data>
 </odoo>
