@@ -100,7 +100,9 @@ class Picking(models.Model):
                       "billToAccount": record.customer_ship_account.x_acct_num,
                       "billToPostalCode": record.customer_ship_account.x_zip,
                       "billToCountryCode": record.customer_ship_account.x_partner_id.country_id.code or "US",
-                      "customField1": record.customer_ship_account.x_carrier_id.name
+                      "customField1": record.customer_ship_account.x_carrier_id.name,
+                      "customField2": record.customer_ship_account.x_acct_num,
+                      "customField3": record.customer_ship_account.x_zip,
                     },
                 }
                 python_dict.update(add_option)
