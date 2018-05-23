@@ -159,23 +159,17 @@
       <field name="inherit_id" ref="stock.view_picking_form"/>
       <field name="priority">99</field>
       <field name="arch" type="xml">
-        <xpath expr="//header" position="inside">
-          <button name="create_update_ssorder" type="object" string="Create Shipstation Order" attrs="{'invisible':['|','|',('picking_type_code','!=','outgoing'),('ss_id','!=',0),('state','not in',['partially_available','assigned'])]}"/>
-          <button name="create_update_ssorder" type="object" string="Update Shipstation Order" attrs="{'invisible':['|',('ss_id','=',0),('ss_status','in',['shipped','cancelled','awaiting_shipment'])]}"/>
-          <button name="create_ss_label" type="object" string="Create Shipstation Label" attrs="{'invisible':['|',('ss_id','=',0),('ss_status','in',['shipped','cancelled','awaiting_shipment'])]}"/>
-        </xpath>
         <xpath expr="//field[@name='partner_id']" position="before">
           <label for="ss_id" attrs="{'invisible':[('ss_id','=',0)]}"/>
           <div attrs="{'invisible':[('ss_id','=',0)]}">
             <field name="ss_id" readonly="1" attrs="{'invisible':[('ss_id','=',0)]}"/> |
             <field name="ss_status" readonly="1" attrs="{'invisible':[('ss_id','=',0)]}"/> |
             <field name="ss_address_status" readonly="1" attrs="{'invisible':[('ss_id','=',0)]}"/> |
-            <button name="delete_ssorder" string="Cancel" type="object" attrs="{'invisible':[('ss_status','=','cancelled')]}" invisible="1"/>
           </div>
-          <field name="ss_ship_id" attrs="{'invisible':[('ss_ship_id','=',0)]}"/>
         </xpath>
         <xpath expr="//field[@name='carrier_id']" position="after">
-          <field name="confirmation"/>
+          <field name="customer_ship_account" domain="[('x_partner_id','=',partner_id)]"/>
+          <field name="do_not_send"/>
         </xpath>
       </field>
     </record>
