@@ -57,10 +57,10 @@ class Picking(models.Model):
         for record in self:
             if record.picking_type_code == 'outgoing' and record.do_not_send != True:
                 record.create_update_ssorder()
-            if picking.sale_id and not picking.purchase_id:
+            if record.sale_id and not record.purchase_id:
                 try:
-                    picking.sale_id.action_invoice_create()
-                    for invoice in picking.sale_id.invoice_ids.filtered(lambda r: r.state == 'draft'):
+                    record.sale_id.action_invoice_create()
+                    for invoice in record.sale_id.invoice_ids.filtered(lambda r: r.state == 'draft'):
                         invoice.action_invoice_open()
                         invoice.picking_id = picking
                 except:
