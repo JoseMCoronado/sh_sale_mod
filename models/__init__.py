@@ -6,3 +6,4 @@ import res_partner
 import res_company
 import stock_picking
 import delivery
+import account_invoice

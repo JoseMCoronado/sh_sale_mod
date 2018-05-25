@@ -30,6 +30,7 @@ class Picking(models.Model):
         ], string='Confirmation method', default='none',copy=False)
     do_not_send = fields.Boolean(string="Do Not Send to Shipstaion")
     customer_ship_account = fields.Many2one('x_customer.shipping.account',string="Third Party Account")
+    ship_date = fields.Date(string="Ship Date")
 
     @api.constrains('partner_id')
     def set_shipping_account(self):
@@ -43,12 +44,27 @@ class Picking(models.Model):
                 else:
                     record.customer_ship_account = accounts[0]
 
+    @api.constrains('carrier_tracking_ref','ship_date')
+    def set_tracking_to_invoice(self):
+        for record in self:
+            invoices = record.env['account.invoice'].search([('picking_id','=',record.id)])
+            for inv in invoices:
+                inv.write({'x_tracking':record.ship_date,'x_ship_date':record.carrier_tracking_ref})
+
     @api.multi
     def do_transfer(self):
         super(Picking, self).do_transfer()
         for record in self:
             if record.picking_type_code == 'outgoing' and record.do_not_send != True:
                 record.create_update_ssorder()
+            if picking.sale_id and not picking.purchase_id:
+                try:
+                    picking.sale_id.action_invoice_create()
+                    for invoice in picking.sale_id.invoice_ids.filtered(lambda r: r.state == 'draft'):
+                        invoice.action_invoice_open()
+                        invoice.picking_id = picking
+                except:
+                    continue
             return True
 
     @api.multi
@@ -56,6 +72,17 @@ class Picking(models.Model):
         for record in self:
             company = record.env.user.company_id
             customer = record.partner_id
+
+            domain_customers = []
+            domain_customers.append(customer.id)
+            if customer.parent_id :
+                domain_customers.append(customer.parent_id.id)
+            children = record.env['res.partner'].browse(domain_customers).mapped('child_ids').filtered(lambda x: x.type == 'delivery')
+            if children:
+                selected_email = children[0].email
+            else:
+                selected_email = customer.email
+
             customer_object = {
               "name": customer.name,
               "company": customer.parent_id.name or None,
@@ -92,6 +119,7 @@ class Picking(models.Model):
                     "shipTo": customer_object,
                     "items": order_item_list,
                     "orderStatus": record.ss_status or "awaiting_shipment",
+                    "customerEmail": selected_email
                 }
             if record.customer_ship_account:
                 add_option = {
