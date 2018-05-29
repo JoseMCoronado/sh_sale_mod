@@ -62,7 +62,7 @@ class Picking(models.Model):
                     record.sale_id.action_invoice_create()
                     for invoice in record.sale_id.invoice_ids.filtered(lambda r: r.state == 'draft'):
                         invoice.action_invoice_open()
-                        invoice.picking_id = picking
+                        invoice.picking_id = record.id
                 except:
                     continue
             return True
