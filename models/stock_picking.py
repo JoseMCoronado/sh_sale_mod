@@ -49,7 +49,7 @@ class Picking(models.Model):
         for record in self:
             invoices = record.env['account.invoice'].search([('picking_id','=',record.id)])
             for inv in invoices:
-                inv.write({'x_tracking':record.ship_date,'x_ship_date':record.carrier_tracking_ref})
+                inv.write({'x_tracking':record.carrier_tracking_ref,'x_ship_date':record.ship_date})
 
     @api.multi
     def do_transfer(self):

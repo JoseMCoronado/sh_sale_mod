@@ -11,4 +11,4 @@ class AccountInvoice(models.Model):
     def set_tracking_to_invoice(self):
         for record in self:
             if record.picking_id:
-                record.write({'x_tracking':record.picking_id.ship_date,'x_ship_date':record.picking_id.carrier_tracking_ref})
+                record.write({'x_tracking':record.picking_id.carrier_tracking_ref,'x_ship_date':record.picking_id.ship_date})
