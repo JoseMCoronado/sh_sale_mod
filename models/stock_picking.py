@@ -63,6 +63,11 @@ class Picking(models.Model):
                     for invoice in record.sale_id.invoice_ids.filtered(lambda r: r.state == 'draft'):
                         invoice.action_invoice_open()
                         invoice.picking_id = record.id
+                        invoice.write({
+                            'picking_id': record.id,
+                            'x_request_date': record.requested_date,
+                            'x_commitment_date': record.commitment_date,
+                        })
                 except:
                     continue
             return True
