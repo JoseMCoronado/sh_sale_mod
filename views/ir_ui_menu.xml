@@ -7,6 +7,12 @@
       <field name="sequence">1</field>
       <field name="action" ref="action_sale_quotation"/>
     </record>
+    <record model="ir.ui.menu" id="menu_sale_defect_types">
+      <field name="parent_id" ref="sales_team.menu_sale_config"/>
+      <field name="name">RMA Defect Types</field>
+      <field name="sequence">9</field>
+      <field name="action" ref="action_sale_order_defect_type"/>
+    </record>
       <record model="ir.ui.menu" id="menu_delivery_service_code">
       <field name="action" ref="sh_sale_mod.action_delivery_service_code"/>
       <field name="active" eval="True"/>

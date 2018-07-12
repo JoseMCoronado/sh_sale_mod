@@ -83,6 +83,20 @@
             </tree>
           </field>
     </record>
+    <record model="ir.ui.view" id="view_sale_order_defect_type_tree">
+          <field name="name">x_gfp.sale.order.line.defect.type.tree</field>
+          <field name="model">sale.order.line.defect.type</field>
+          <field name="inherit_id" eval="False"/>
+          <field name="priority">16</field>
+          <field name="groups_id" eval="[(6, 0, [])]"/>
+          <field name="type">tree</field>
+          <field name="mode">primary</field>
+          <field name="arch" type="xml">
+            <tree>
+              <field name="name"/>
+            </tree>
+          </field>
+    </record>
     <record model="ir.ui.view" id="view_add_sale_quotation_line">
           <field name="name">x_gfp.add.sale.quotation.line.form</field>
           <field name="model">add.sale.quotation.line</field>
@@ -103,6 +117,38 @@
                 </footer>
             </form>
           </field>
+    </record>
+    <record model="ir.ui.view" id="view_order_form_mod">
+      <field name="name">x_gfp.sale.order.form.mod</field>
+      <field name="model">sale.order</field>
+      <field name="inherit_id" ref="sale.view_order_form"/>
+      <field name="priority">99</field>
+      <field name="arch" type="xml">
+        <xpath expr="//header" position="inside">
+          <button string="Create RMA" type="object" name="create_rma"/>
+        </xpath>
+        <xpath expr="//div[@name='button_box']" position="inside">
+            <button name="action_view_rma_orders" type="object" class="oe_stat_button" icon="fa-undo" attrs="{'invisible': [('rma_count', '=', 0)]}">
+                <field name="rma_count" widget="statinfo" string="RMA(s)"/>
+            </button>
+        </xpath>
+        <xpath expr="//field[@name='partner_id']" position="before">
+          <field name="original_sale_id" attrs="{'invisible':[('original_sale_id','=',False)]}"/>
+          <field name="order_type" invisible="1"/>
+        </xpath>
+        <xpath expr="//notebook/page" position="after">
+          <page string="Defect Notes" attrs="{'invisible':[('order_type','!=','rma')]}">
+            <field name="defect_order_line" mode="tree">
+              <tree string="Sales Order Lines" editable="bottom" create="0">
+                  <field name="sequence" widget="handle"/>
+                  <field name="product_id" readonly="1"/>
+                  <field name="defect_type" options="{'no_open':True,'no_create':True}"/>
+                  <field name="defect_notes"/>
+              </tree>
+            </field>
+          </page>
+        </xpath>
+      </field>
     </record>
     <record model="ir.ui.view" id="view_partner_form_mod">
       <field name="name">x_gfp.res.partner.form.mod</field>
