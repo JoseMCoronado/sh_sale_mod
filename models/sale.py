@@ -39,6 +39,7 @@ class SaleOrder(models.Model):
             copied_sale = record.copy()
             copied_sale.order_type = 'rma'
             copied_sale.name = self.env['ir.sequence'].next_by_code('rma.sequence')
+            copied_sale.client_order_ref = copied_sale.name
             copied_sale.original_sale_id = record.id
             action = record.env.ref('sale.action_quotations')
             result = action.read()[0]
