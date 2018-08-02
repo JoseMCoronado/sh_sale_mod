@@ -12,7 +12,7 @@ class SaleOrder(models.Model):
     original_sale_id = fields.Many2one('sale.order',string="Original Sale Order")
     rma_count = fields.Integer(string='RMA count',compute='_get_rma_count',readonly=True,store=False)
     rma_ids = fields.One2many('sale.order', 'original_sale_id', string='RMAs')
-    defect_order_line = fields.One2many('sale.order.line', related="order_line",string="Defect Order Lines")
+    defect_order_line = fields.One2many('sale.order.line','order_id',string="Defect Order Lines")
 
     @api.multi
     def action_view_rma_orders(self):
