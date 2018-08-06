@@ -137,7 +137,7 @@
           <field name="order_type" invisible="1"/>
         </xpath>
         <xpath expr="//field[@name='partner_id']/.." position="inside">
-          <field name="rma_type" widget="radio"/>
+          <field name="rma_type" widget="radio" attrs="{'invisible':[('order_type','!=','rma')],'required':[('order_type','!=','rma')]}"/>
         </xpath>
         <xpath expr="//notebook/page" position="after">
           <page string="Defect Notes" attrs="{'invisible':[('order_type','!=','rma')]}">

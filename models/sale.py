@@ -16,7 +16,7 @@ class SaleOrder(models.Model):
     rma_type = fields.Selection([
         ('change', 'Customer Change'),
         ('defect', 'Product Defect'),
-        ], string='RMA Type', default="change")
+        ], string='RMA Type')
 
     @api.multi
     def action_view_rma_orders(self):

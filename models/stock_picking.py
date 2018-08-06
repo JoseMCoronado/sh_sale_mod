@@ -117,7 +117,10 @@ class Picking(models.Model):
                   "upc": p.product_id.barcode or None,
                 }
                 order_item_list.append(newitem)
-
+            if record.sale_id and record.sale_id.client_order_ref:
+                clientref = record.sale_id.client_order_ref
+            else:
+                clientref = ''
             python_dict = {
                     "orderNumber": ss_name,
                     "orderKey": str(record.id),
@@ -130,10 +133,6 @@ class Picking(models.Model):
                     "customerNotes": clientref,
                 }
             if record.customer_ship_account:
-                if record.sale_id and record.sale_id.client_order_ref:
-                    clientref = record.sale_id.client_order_ref
-                else:
-                    clientref = ''
                 add_option = {
                     "advancedOptions": {
                       "billToParty":"third_party",
