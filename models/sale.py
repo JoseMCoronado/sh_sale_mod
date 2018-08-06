@@ -13,6 +13,10 @@ class SaleOrder(models.Model):
     rma_count = fields.Integer(string='RMA count',compute='_get_rma_count',readonly=True,store=False)
     rma_ids = fields.One2many('sale.order', 'original_sale_id', string='RMAs')
     defect_order_line = fields.One2many('sale.order.line','order_id',string="Defect Order Lines")
+    rma_type = fields.Selection([
+        ('change', 'Customer Change'),
+        ('defect', 'Product Defect'),
+        ], string='RMA Type', default="change")
 
     @api.multi
     def action_view_rma_orders(self):
@@ -51,8 +55,8 @@ class SaleOrder(models.Model):
 class SaleOrderLine(models.Model):
     _inherit = "sale.order.line"
 
-    defect_type = fields.Many2one('sale.order.line.defect.type',string="Defect Type")
-    defect_notes = fields.Text(string="Defect Notes")
+    defect_type = fields.Many2one('sale.order.line.defect.type',string="Reason")
+    defect_notes = fields.Text(string="Notes")
 
 class SaleOrderLineDefectType(models.Model):
     _name = "sale.order.line.defect.type"

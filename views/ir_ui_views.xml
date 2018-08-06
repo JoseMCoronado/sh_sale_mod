@@ -136,6 +136,9 @@
           <field name="original_sale_id" attrs="{'invisible':[('original_sale_id','=',False)]}"/>
           <field name="order_type" invisible="1"/>
         </xpath>
+        <xpath expr="//field[@name='partner_id']/.." position="inside">
+          <field name="rma_type" widget="radio"/>
+        </xpath>
         <xpath expr="//notebook/page" position="after">
           <page string="Defect Notes" attrs="{'invisible':[('order_type','!=','rma')]}">
             <field name="defect_order_line" mode="tree">

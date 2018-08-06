@@ -77,7 +77,10 @@ class Picking(models.Model):
         for record in self:
             company = record.env.user.company_id
             customer = record.partner_id
-
+            if record.sale_workorder_id:
+                ss_name = str(record.sale_workorder_id.name)
+            else:
+                ss_name =str(record.name)
             domain_customers = []
             domain_customers.append(customer.id)
             if customer.parent_id :
@@ -87,7 +90,6 @@ class Picking(models.Model):
                 selected_email = children[0].email
             else:
                 selected_email = customer.email
-
             customer_object = {
               "name": customer.name,
               "company": customer.parent_id.name or None,
@@ -117,16 +119,21 @@ class Picking(models.Model):
                 order_item_list.append(newitem)
 
             python_dict = {
-                    "orderNumber": str(record.name),
+                    "orderNumber": ss_name,
                     "orderKey": str(record.id),
                     "orderDate": str(datetime.datetime.now()),
                     "billTo": customer_object,
                     "shipTo": customer_object,
                     "items": order_item_list,
                     "orderStatus": record.ss_status or "awaiting_shipment",
-                    "customerEmail": selected_email
+                    "customerEmail": selected_email,
+                    "customerNotes": clientref,
                 }
             if record.customer_ship_account:
+                if record.sale_id and record.sale_id.client_order_ref:
+                    clientref = record.sale_id.client_order_ref
+                else:
+                    clientref = ''
                 add_option = {
                     "advancedOptions": {
                       "billToParty":"third_party",
