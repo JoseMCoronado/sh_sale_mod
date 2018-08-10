@@ -23,7 +23,7 @@
       <field name="parent_id" ref="sales_team.menu_sales"/>
       <field name="name">Sale Order Lines</field>
       <field name="sequence">13</field>
-      <field name="action" ref="action_sale_order_change_type"/>
+      <field name="action" ref="action_sale_order_line_graph"/>
     </record>
     <record model="ir.ui.menu" id="menu_delivery_service_code">
       <field name="action" ref="sh_sale_mod.action_delivery_service_code"/>

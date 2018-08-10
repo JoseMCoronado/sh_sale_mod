@@ -159,6 +159,7 @@
               <tree string="Sales Order Lines" editable="bottom" create="0">
                   <field name="sequence" widget="handle"/>
                   <field name="product_id" readonly="1"/>
+                  <field name="rma_type" invisible="1"/>
                   <field name="defect_type" options="{'no_open':True,'no_create':True}" attrs="{'invisible':[('rma_type','=','change')]}"/>
                   <field name="change_type" options="{'no_open':True,'no_create':True}" attrs="{'invisible':[('rma_type','=','defect')]}"/>
                   <field name="defect_notes"/>
