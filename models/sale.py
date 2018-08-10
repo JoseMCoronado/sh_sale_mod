@@ -55,11 +55,22 @@ class SaleOrder(models.Model):
 class SaleOrderLine(models.Model):
     _inherit = "sale.order.line"
 
-    defect_type = fields.Many2one('sale.order.line.defect.type',string="Reason")
+    defect_type = fields.Many2one('sale.order.line.defect.type',string="Defect Reason")
+    change_type = fields.Many2one('sale.order.line.change.type',string="Change Reason")
     defect_notes = fields.Text(string="Notes")
+    rma_type = fields.Selection([
+        ('change', 'Customer Change'),
+        ('defect', 'Product Defect'),
+        ], string='RMA Type',related="order_id.rma_type")
 
 class SaleOrderLineDefectType(models.Model):
     _name = "sale.order.line.defect.type"
     _description = "RMA Defect Type"
+
+    name = fields.Char(string="Type")
+
+class SaleOrderLineChangeType(models.Model):
+    _name = "sale.order.line.change.type"
+    _description = "RMA Change Type"
 
     name = fields.Char(string="Type")

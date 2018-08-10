@@ -43,6 +43,34 @@
       <field name="view_mode">tree,form</field>
       <field name="view_type">form</field>
     </record>
+    <record model="ir.actions.act_window" id="action_sale_order_change_type">
+      <field name="auto_search" eval="True"/>
+      <field name="context">{}</field>
+      <field name="groups_id" eval="[(6, 0, [])]"/>
+      <field name="limit">80</field>
+      <field name="name">Change Types</field>
+      <field name="res_model">sale.order.line.change.type</field>
+      <field name="target">current</field>
+      <field name="type">ir.actions.act_window</field>
+      <field name="view_id" eval="False"/>
+      <field name="view_ids" eval="[(6, 0, [])]"/>
+      <field name="view_mode">tree,form</field>
+      <field name="view_type">form</field>
+    </record>
+    <record model="ir.actions.act_window" id="action_sale_order_line_graph">
+      <field name="auto_search" eval="True"/>
+      <field name="context">{}</field>
+      <field name="groups_id" eval="[(6, 0, [])]"/>
+      <field name="limit">80</field>
+      <field name="name">Sale Order Lines</field>
+      <field name="res_model">sale.order.line</field>
+      <field name="target">current</field>
+      <field name="type">ir.actions.act_window</field>
+      <field name="view_id" eval="False"/>
+      <field name="view_ids" eval="[(6, 0, [])]"/>
+      <field name="view_mode">graph,tree,form</field>
+      <field name="view_type">form</field>
+    </record>
     <record model="ir.actions.act_window" id="action_delivery_service_code">
       <field name="auto_search" eval="True"/>
       <field name="context">{}</field>

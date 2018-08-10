@@ -33,5 +33,13 @@
       <field name="perm_create" eval="True"/>
       <field name="model_id" ref="model_sale_order_line_defect_type"/>
     </record>
+    <record model="ir.model.access" id="access_model_sale_order_line_change_type">
+      <field name="name">Global</field>
+      <field name="perm_write" eval="True"/>
+      <field name="perm_unlink" eval="True"/>
+      <field name="perm_read" eval="True"/>
+      <field name="perm_create" eval="True"/>
+      <field name="model_id" ref="model_sale_order_line_change_type"/>
+    </record>
   </data>
 </odoo>

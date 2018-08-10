@@ -97,6 +97,20 @@
             </tree>
           </field>
     </record>
+    <record model="ir.ui.view" id="view_sale_order_change_type_tree">
+          <field name="name">x_gfp.sale.order.line.change.type.tree</field>
+          <field name="model">sale.order.line.change.type</field>
+          <field name="inherit_id" eval="False"/>
+          <field name="priority">16</field>
+          <field name="groups_id" eval="[(6, 0, [])]"/>
+          <field name="type">tree</field>
+          <field name="mode">primary</field>
+          <field name="arch" type="xml">
+            <tree>
+              <field name="name"/>
+            </tree>
+          </field>
+    </record>
     <record model="ir.ui.view" id="view_add_sale_quotation_line">
           <field name="name">x_gfp.add.sale.quotation.line.form</field>
           <field name="model">add.sale.quotation.line</field>
@@ -145,7 +159,8 @@
               <tree string="Sales Order Lines" editable="bottom" create="0">
                   <field name="sequence" widget="handle"/>
                   <field name="product_id" readonly="1"/>
-                  <field name="defect_type" options="{'no_open':True,'no_create':True}"/>
+                  <field name="defect_type" options="{'no_open':True,'no_create':True}" attrs="{'invisible':[('rma_type','=','change')]}"/>
+                  <field name="change_type" options="{'no_open':True,'no_create':True}" attrs="{'invisible':[('rma_type','=','defect')]}"/>
                   <field name="defect_notes"/>
               </tree>
             </field>
