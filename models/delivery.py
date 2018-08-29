@@ -55,7 +55,7 @@ class CustomerShippingAccount(models.Model):
         for record in self.sudo():
             mydict = {
                       'id': record.id,
-                      'partner_id': record.partner_id,
+                      'partner_id': record.partner_id.name,
                       'carrier_id': record.carrier_id,
                       'name': record.name,
                       }
