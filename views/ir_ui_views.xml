@@ -260,6 +260,7 @@
       <field name="priority">99</field>
       <field name="arch" type="xml">
         <xpath expr="//field[@name='delivery_type']" position="after">
+          <field name="carrier_code"/>
           <field name="service_code"/>
         </xpath>
       </field>
