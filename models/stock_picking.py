@@ -29,7 +29,7 @@ class Picking(models.Model):
         ('direct_signature', 'Direct Signature'),
         ], string='Confirmation method', default='none',copy=False)
     do_not_send = fields.Boolean(string="Do Not Send to Shipstaion")
-    customer_ship_account = fields.Many2one('customer.shipping.account',string="Third Party Account")
+    #customer_ship_account = fields.Many2one('customer.shipping.account',string="Third Party Account")
     ship_date = fields.Date(string="Ship Date")
 
     @api.constrains('carrier_tracking_ref','ship_date')

@@ -73,6 +73,6 @@ class ResCompany(models.Model):
                             'integration_level': 'rate',
                             'carrier_code': record.env['delivery.carrier.code'].search([('code','=',c['carrierCode'])]).id,
                             'service_code': c['code'],
-                            'product_id': record.env.ref('delivery.product_product_delivery_product_template').product_variant_id.id,
+                            'product_id': record.env.ref('sh_sale_mod.delivery_product').product_variant_id.id,
                         }
                         service.create(data)

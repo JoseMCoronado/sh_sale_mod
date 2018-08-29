@@ -248,7 +248,7 @@
           </div>
         </xpath>
         <xpath expr="//field[@name='carrier_id']" position="after">
-          <field name="customer_ship_account" domain="[('x_partner_id','=',partner_id)]"/>
+          <!--<field name="customer_ship_account" domain="[('partner_id','=',partner_id)]"/>-->
           <field name="do_not_send"/>
         </xpath>
       </field>
