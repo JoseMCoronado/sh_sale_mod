@@ -7,7 +7,8 @@ class ResPartner(models.Model):
     _inherit = "res.partner"
 
     quotation_count = fields.Integer(string="Quotations",compute="_get_quotation_count", store=False,readonly=True)
-
+    shipping_account_ids = fields.One2many('customer.shipping.account','partner_id',string="Shipping Accounts")
+    
     @api.multi
     def _get_quotation_count(self):
         for record in self:

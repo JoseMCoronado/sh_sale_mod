@@ -29,20 +29,8 @@ class Picking(models.Model):
         ('direct_signature', 'Direct Signature'),
         ], string='Confirmation method', default='none',copy=False)
     do_not_send = fields.Boolean(string="Do Not Send to Shipstaion")
-    customer_ship_account = fields.Many2one('x_customer.shipping.account',string="Third Party Account")
+    customer_ship_account = fields.Many2one('customer.shipping.account',string="Third Party Account")
     ship_date = fields.Date(string="Ship Date")
-
-    @api.constrains('partner_id')
-    def set_shipping_account(self):
-        for record in self:
-            accounts = record.env['x_customer.shipping.account'].search([('x_partner_id','=',record.partner_id.id)])
-            if accounts:
-                if record.carrier_id:
-                    refined_accounts = accounts.search([('x_carrier_id','=',record.carrier_id.id)])
-                    if refined_accounts:
-                        record.customer_ship_account = refined_accounts[0]
-                else:
-                    record.customer_ship_account = accounts[0]
 
     @api.constrains('carrier_tracking_ref','ship_date')
     def set_tracking_to_invoice(self):
@@ -132,16 +120,18 @@ class Picking(models.Model):
                     "customerEmail": selected_email,
                     "customerNotes": clientref,
                 }
+            if record.carrier_id:
+                python_dict.update({'carrierCode':record.carrier_id.carrier_code.code,'serviceCode':record.carrier_id.service_code})
             if record.customer_ship_account:
                 add_option = {
                     "advancedOptions": {
                       "billToParty":"third_party",
-                      "billToAccount": record.customer_ship_account.x_acct_num,
-                      "billToPostalCode": record.customer_ship_account.x_zip,
-                      "billToCountryCode": record.customer_ship_account.x_partner_id.country_id.code or "US",
-                      "customField1": record.customer_ship_account.x_carrier_id.name,
-                      "customField2": record.customer_ship_account.x_acct_num,
-                      "customField3": record.customer_ship_account.x_zip,
+                      "billToAccount": record.customer_ship_account.name,
+                      "billToPostalCode": record.customer_ship_account.zip,
+                      "billToCountryCode": record.customer_ship_account.partner_id.country_id.code or "US",
+                      "customField1": record.customer_ship_account.carrier_id.name,
+                      "customField2": record.customer_ship_account.name,
+                      "customField3": record.customer_ship_account.zip,
                     },
                 }
                 python_dict.update(add_option)

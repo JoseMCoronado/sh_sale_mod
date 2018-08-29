@@ -180,6 +180,21 @@
               <field string="Quotations" name="quotation_count" widget="statinfo"/>
           </button>
         </xpath>
+        <xpath expr="//page[@name='internal_notes']" position="after">
+          <page name="shipping2" string="Shipping Accounts" attrs="{'invisible': [('customer','=', False)]}">
+            <field name="shipping_account_ids" nolabel="1" widget="one2many_list" mode="tree" context="{'partner_id': id}">
+              <tree string="Accounts" editable="bottom">
+                <field name="sequence" widget="handle"/>
+                <field name="partner_id" invisible="1"/>
+                <field name="carrier_id" options="{'no_open':True,'no_create':True}"/>
+                <field name="name"/>
+                <field name="zip"/>
+                <field name="notes"/>
+                <field name="sh_account"/>
+              </tree>
+            </field>
+          </page>
+        </xpath>
       </field>
     </record>
     <record model="ir.ui.view" id="product_pricelist_view_mod">

@@ -25,6 +25,22 @@
       <field name="perm_create" eval="True"/>
       <field name="model_id" ref="model_delivery_service_code"/>
     </record>
+    <record model="ir.model.access" id="access_model_delivery_carrier_code">
+      <field name="name">Global</field>
+      <field name="perm_write" eval="True"/>
+      <field name="perm_unlink" eval="True"/>
+      <field name="perm_read" eval="True"/>
+      <field name="perm_create" eval="True"/>
+      <field name="model_id" ref="model_delivery_carrier_code"/>
+    </record>
+    <record model="ir.model.access" id="access_model_customer_shipping_account">
+      <field name="name">Global</field>
+      <field name="perm_write" eval="True"/>
+      <field name="perm_unlink" eval="True"/>
+      <field name="perm_read" eval="True"/>
+      <field name="perm_create" eval="True"/>
+      <field name="model_id" ref="model_customer_shipping_account"/>
+    </record>
     <record model="ir.model.access" id="access_model_sale_order_line_defect_type">
       <field name="name">Global</field>
       <field name="perm_write" eval="True"/>

@@ -47,6 +47,8 @@ class ResCompany(models.Model):
             carrier_list = []
             for c in json_object:
                 carrier_list.append(c['code'])
+                if not record.env['delivery.carrier.code'].search([('code','=',c['code'])]):
+                    record.env['delivery.carrier.code'].create({'name':c['name'],'code':c['code']})
             return carrier_list
 
     @api.multi
@@ -60,7 +62,7 @@ class ResCompany(models.Model):
                 content = conn[1]
                 if response.status_code != requests.codes.ok:
                     raise UserError(_("%s\n%s: %s" % (url,response.status_code,content)))
-                service = record.env['delivery.service.code']
+                service = record.env['delivery.carrier']
                 present_service_list = service.search([]).mapped('service_code')
                 json_object_str = content
                 json_object = json.loads(json_object_str)
@@ -68,9 +70,9 @@ class ResCompany(models.Model):
                     if c['code'] not in present_service_list:
                         data = {
                             'name': c['name'],
-                            'carrier_code': c['carrierCode'],
+                            'integration_level': 'rate',
+                            'carrier_code': record.env['delivery.carrier.code'].search([('code','=',c['carrierCode'])]).id,
                             'service_code': c['code'],
-                            'international': c['international'],
-                            'domestic': c['domestic'],
+                            'product_id': record.env.ref('delivery.product_product_delivery_product_template').product_variant_id.id,
                         }
                         service.create(data)
