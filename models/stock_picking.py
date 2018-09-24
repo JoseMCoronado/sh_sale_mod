@@ -43,7 +43,7 @@ class Picking(models.Model):
     def do_transfer(self):
         super(Picking, self).do_transfer()
         for record in self:
-            if record.picking_type_code == 'outgoing' and record.do_not_send != True:
+            if record.picking_type_code == 'outgoing' and record.carrier_id and record.carrier_id.service_code != False and record.do_not_send != True:
                 record.create_update_ssorder()
             if record.sale_id and not record.purchase_id:
                 try:
