@@ -43,9 +43,11 @@ class CustomerShippingAccount(models.Model):
 
         def _name_get(d):
             name = d.get('name', '')
-            partner_id = d.get('partner_id', '')
-            carrier_id = d.get('partner_id', '')
-            name = '%s %s %s' % (partner_id,name,carrier_id)
+            #partner_id = d.get('partner_id', '')
+            carrier_id = d.get('carrier_id', '')
+            name = '%s' % (name)
+            if carrier_id:
+                name = '%s (%s)' % (name,carrier_id)
             return (d['id'], name)
 
         self.check_access_rights("read")
@@ -56,7 +58,7 @@ class CustomerShippingAccount(models.Model):
             mydict = {
                       'id': record.id,
                       'partner_id': record.partner_id.name,
-                      'carrier_id': record.carrier_id,
+                      'carrier_id': record.carrier_id.carrier_code.name,
                       'name': record.name,
                       }
             result.append(_name_get(mydict))

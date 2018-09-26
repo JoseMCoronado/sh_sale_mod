@@ -194,6 +194,9 @@
             </field>
           </page>
         </xpath>
+        <xpath expr="//field[@name='property_delivery_carrier_id']" position="attributes">
+          <attribute name="options">{'no_open':True,'no_create':True}</attribute>
+        </xpath>
       </field>
     </record>
     <record model="ir.ui.view" id="product_pricelist_view_mod">
@@ -238,6 +241,10 @@
       <field name="inherit_id" ref="stock.view_picking_form"/>
       <field name="priority">99</field>
       <field name="arch" type="xml">
+        <xpath expr="//header" position="inside">
+          <button name="create_update_ssorder" string="Send to Shipstation" type="object" attrs="{'invisible':[('ss_id','!=',0)]}"/>
+          <button name="create_update_ssorder" string="Re-send to Shipstation" type="object" attrs="{'invisible':[('ss_id','=',0)]}"/>
+        </xpath>
         <xpath expr="//field[@name='partner_id']" position="before">
           <label for="ss_id" attrs="{'invisible':[('ss_id','=',0)]}"/>
           <div attrs="{'invisible':[('ss_id','=',0)]}">
