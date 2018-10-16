@@ -61,6 +61,12 @@ class Picking(models.Model):
             return True
 
     @api.multi
+    def _add_delivery_cost_to_so(self):
+        self.ensure_one()
+        sale_order = self.sale_id
+        #removed addition of deliver order line.
+
+    @api.multi
     def create_update_ssorder(self):
         for record in self:
             company = record.env.user.company_id
