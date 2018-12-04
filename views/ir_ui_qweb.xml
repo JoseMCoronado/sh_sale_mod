@@ -42,9 +42,9 @@
                               <td width="30%" t-if="display_image"><img t-if="l.product_id.image_medium and l.product_id.id not in unique_products" t-att-src="'data:image/png;base64,'+l.product_id.image_medium" style="max-height: 80px;"/></td>
                               <td width="15%" style="white-space:nowrap;"><strong><span t-if="l.product_id.id not in unique_products" t-esc="str(l.product_id.code)"/></strong></td>
                               <td width="35%"><span t-if="l.product_id.id not in unique_products" t-field="l.name"/></td>
-                              <td width="10%" t-if="doc.display_msrp == True and l.product_id.id not in unique_products"><span t-field="l.original_price"/></td>
+                              <td width="10%" t-if="doc.display_msrp == True and l.product_id.id not in unique_products"><span t-esc="'%.2f'%l.original_price"/></td>
                               <td t-if="doc.display_msrp == True and l.product_id.id in unique_products"> </td>
-                              <td width="10%"><span t-field="l.min_quantity"/></td>
+                              <td width="10%"><span t-field="int(l.min_quantity)"/></td>
                               <td width="10%"><span t-field="l.price"/></td>
                             </tr>
                             <t t-set="unique_products" t-value="unique_products + [l.product_id.id]"/>
