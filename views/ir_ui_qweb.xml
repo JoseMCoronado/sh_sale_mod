@@ -44,7 +44,7 @@
                               <td width="35%"><span t-if="l.product_id.id not in unique_products" t-field="l.name"/></td>
                               <td width="10%" t-if="doc.display_msrp == True and l.product_id.id not in unique_products"><span t-esc="'%.2f'%l.original_price"/></td>
                               <td t-if="doc.display_msrp == True and l.product_id.id in unique_products"> </td>
-                              <td width="10%"><span t-field="int(l.min_quantity)"/></td>
+                              <td width="10%"><span t-esc="int(l.min_quantity)"/></td>
                               <td width="10%"><span t-field="l.price"/></td>
                             </tr>
                             <t t-set="unique_products" t-value="unique_products + [l.product_id.id]"/>
